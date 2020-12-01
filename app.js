@@ -1,78 +1,138 @@
+let moduloProductos = require('./productos');
+
 let process = require('process');
-
-let moduloDeProductos = require('./modulos');
-
 let comando = process.argv[2];
 
 switch (comando) {
+
     case 'listar':
-        let productos = moduloDeProductos.leerJSON();
 
-        if (productos.length === 0) {
-            console.log('La lista de productos esta vacia');
-        } else {
-            console.log('-----' + 'LISTA DE PRODUCTOS' + '-----');
-            for (let i = 0; i < productos.length; i++) {
-                console.log(productos[i].id + ': ' + productos[i].name + ' --- PRICE: ' + productos[i].price);
-            };
-        }
+        let productos = moduloProductos.leerJSON();
+        
+        console.log('------------------')
+        console.log("Lista de productos");
+        console.log('------------------');    
+        
+        productos.forEach( producto => {
+            console.log('id: ' + producto.id + ' Producto: ' + producto.name + ' Precio: ' + producto.price)
+        });
+        
         break;
+
     case 'agregar':
-        let name = process.argv[3];
-        let price = Number(process.argv[4]);
 
-        if (name === undefined || price === undefined) {
-            console.log('-----Debe ingresar los datos requeridos-----');
-        } else {
-            moduloDeProductos.escribirJSON(name, price);
-            console.log('-----Producto añadido correctamente-----');
+        let producto = process.argv[3];
+        let precio = Number(process.argv[4]);
+        
+        if(producto === undefined || precio === undefined){
+
+            console.log('----------------------------------------');
+            console.log("Tenés que escribir un nombre y precio de producto");
+            console.log('----------------------------------------');
+
+        }else{
+            moduloProductos.escribirJSON(producto, precio);
+
+            console.log('------------------------------');
+            console.log("Producto añadido correctamente");
+            console.log('------------------------------');
         }
-        break;
+            break; 
+    
     case 'filtrar':
-        let datoA = process.argv[3];
-        let datoB = process.argv[4];
-        let resultado = moduloDeProductos.filtrar(datoA, datoB);
-        if (datoA === undefined || datoB === undefined) {
-            console.log('-----Debe ingresar los datos requeridos-----');
-        } else {
-            for (let i = 0; i < resultado.length; i++) {
-                console.log(resultado[i].id + ': ' + resultado[i].name + ' --- PRICE: ' + resultado[i].price);
-            };
-        };
-        break;
-    case 'cambiarPrecio':
-        let id = Number(process.argv[3]);
-        let nuevoPrecio = Number(process.argv[4]);
-        if (id == undefined || nuevoPrecio == undefined) {
-            console.log(moduloDeProductos.cambiarPrecio(id, nuevoPrecio));
-        } else {
-            console.log('-----Debe ingresar los datos requeridos-----');
-        }
 
-        break;
-    case 'eliminarProducto':
-        let eliminarId = Number(process.argv[3]);
-        if (eliminarId === undefined) {
-            console.log('-----Debe ingresar el ID de producto a eliminar-----');
-        } else {
-            moduloDeProductos.eliminarProducto(eliminarId);
-            console.log('-----El producto ha sido eliminado-----');
-        }
-        break;
-    case 'buscarProducto':
-        let parametro = Number(process.argv[3]);
-        let productoBuscado = moduloDeProductos.buscarProducto(parametro);
+        let precioMinimo = process.argv[3];
+        let precioMaximo = process.argv[4];
+        
+        if(precioMinimo == undefined){
 
-        if (productoBuscado.length !== 0) {
-            productoBuscado.forEach(element => {
-                console.log(element.id + ': ' + element.name + ' ---PRICE ' + element.price);
+            console.log('-----------------------------------');
+            console.log("Tenés que escribir un precio minimo");
+            console.log('-----------------------------------');
+
+        }else if(precioMaximo == undefined){
+
+            console.log('-----------------------------------');
+            console.log("Tenés que escribir un precio maximo");
+            console.log('-----------------------------------');
+
+        }else{
+
+            let productosFiltrados = moduloProductos.filtrarJSON(precioMinimo, precioMaximo);
+
+            console.log('---------------------------------');
+            console.log("Éstos son los productos filtrados");
+            console.log('---------------------------------');
+            
+            productosFiltrados.forEach(producto => {
+                console.log('Producto: ' + producto.name + ' Precio: ' + producto.price)  
             });
-        } else {
+        };
+        
+        break;
+
+    case 'cambiarPrecio':
+        
+        let id = Number(process.argv[3]);
+        let nuevoPrecio = Number(process.argv[4]);    
+        
+        if(id == undefined || nuevoPrecio == undefined){
+
+            console.log('--------------------------------------------------------------');
+            console.log("Tenés que pasar dos parámetros, id(producto) y su nuevo precio");
+            console.log('--------------------------------------------------------------');
+
+        }
+        
+        moduloProductos.cambiarPrecio(id, nuevoPrecio);
+
+        console.log('--------------------------------');
+        console.log('Producto modificado correctamente');
+        console.log('--------------------------------');
+        
+        break;
+
+    case 'eliminar':
+        
+        let deleteId = Number(process.argv[3]);
+        
+        if(deleteId == undefined){
+
+            console.log('-------------------------------------');
+            console.log('Ingresa el id del producto a eliminar');
+            console.log('-------------------------------------');
+
+        };
+
+        moduloProductos.eliminar(deleteId);
+        
+        console.log('--------------------------------');
+        console.log('Producto eliminado correctamente');
+        console.log('--------------------------------');
+        
+        break;
+
+    case 'buscar':
+
+        let nombreProducto = process.argv[3];
+        let productosBuscados = moduloProductos.buscar(nombreProducto);
+        
+        if(productosBuscados.length !== 0){
+            
+            console.log('-------------------------');
+            console.log('Resultados de la búsqueda');
+            console.log('-------------------------');
+
+        productosBuscados.forEach(producto => {
+        console.log('id: '+ producto.id +' Producto: ' + producto.name + ' Precio: ' + producto.price)
+        
+        });
+        }else{
 
             console.log('----------------------');
             console.log('Producto no encontrado');
             console.log('----------------------');
 
         }
-        break;
-}
+    
+    }
